@@ -11,7 +11,7 @@ Built as a portfolio project to demonstrate full-stack fundamentals beyond basic
 
 ### Login
 
-![Login](Screenshots/Dashscreen2.png)
+![Dashboard](Screenshots/Dashscreen2.png)
 
 ### Register
 

@@ -19,6 +19,15 @@ function Login() {
       setError(err.response?.data?.error || "Something went wrong");
     }
   };
+  const handleDemoLogin = async () => {
+    try {
+      const res = await api.post("/auth/demo");
+      localStorage.setItem("token", res.data.token);
+      navigate("/dashboard");
+    } catch (err) {
+      setError("Could not start demo. Please try again.");
+    }
+  };
 
   return (
     <div className="min-h-screen flex">
@@ -86,7 +95,13 @@ function Login() {
               Log In
             </button>
           </form>
-
+          <button
+            type="button"
+            onClick={handleDemoLogin}
+            className="w-full mt-3 border border-gold text-gold font-heading font-semibold py-3 hover:bg-gold/10 transition-colors"
+          >
+            Try Demo Account
+          </button>
           <p className="text-center mt-6 text-sm text-off-white/50">
             No account?{" "}
             <Link
