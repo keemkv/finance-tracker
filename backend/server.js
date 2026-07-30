@@ -18,7 +18,10 @@ app.use("/api/budgets", budgetRoutes);
 
 const transactionRoutes = require("./routes/transactions");
 app.use("/api/transactions", transactionRoutes);
-
+const friendRoutes = require("./routes/friends");
+app.use("/api/friends", friendRoutes);
+const commentRoutes = require("./routes/comments");
+app.use("/api/comments", commentRoutes);
 app.get("/", (req, res) => {
   res.send("Finance tracker server is running");
 });

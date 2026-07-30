@@ -13,6 +13,7 @@ import {
   YAxis,
   Legend,
 } from "recharts";
+import { Link } from "react-router-dom";
 
 const COLORS = [
   "#C9A961",
@@ -52,6 +53,35 @@ function getWeeklyTotals(transactions, monthStr) {
   return weeks.filter((w, i) => i < 4 || w.total > 0); // drop empty week 5 for short months
 }
 
+function buildCategoryChartData(transactions, summary) {
+  const fromTransactions = transactions.reduce((acc, tx) => {
+    const amount = Number(tx.amount) || 0;
+    if (amount <= 0) {
+      return acc;
+    }
+
+    const categoryName = tx.category_name || tx.category || "Uncategorized";
+    const existing = acc.find((item) => item.category === categoryName);
+
+    if (existing) {
+      existing.total += amount;
+    } else {
+      acc.push({ category: categoryName, total: amount });
+    }
+
+    return acc;
+  }, []);
+
+  if (fromTransactions.length > 0) {
+    return fromTransactions.sort((a, b) => b.total - a.total);
+  }
+
+  return (summary?.byCategory ?? []).map((item) => ({
+    category: item.category || "Uncategorized",
+    total: Number(item.total) || 0,
+  }));
+}
+
 function Dashboard() {
   const today = new Date();
   const defaultMonth = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, "0")}`;
@@ -81,6 +111,7 @@ function Dashboard() {
   const [editCategoryId, setEditCategoryId] = useState("");
   const [editDescription, setEditDescription] = useState("");
   const [editDate, setEditDate] = useState("");
+  const [myComments, setMyComments] = useState([]);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -90,6 +121,20 @@ function Dashboard() {
   useEffect(() => {
     fetchData();
   }, [month]);
+  useEffect(() => {
+    fetchMyComments();
+  }, []);
+
+  const myUserId = localStorage.getItem("userId");
+
+  const fetchMyComments = async () => {
+    try {
+      const res = await api.get(`/comments/${myUserId}`);
+      setMyComments(res.data);
+    } catch (err) {
+      console.error(err);
+    }
+  };
 
   const fetchCategories = async () => {
     try {
@@ -228,10 +273,7 @@ function Dashboard() {
   };
 
   const weeklyData = getWeeklyTotals(transactions, month);
-  const categoryChartData = (summary?.byCategory ?? []).map((item) => ({
-    ...item,
-    total: Number(item.total) || 0,
-  }));
+  const categoryChartData = buildCategoryChartData(transactions, summary);
   const hasCategoryChartData = categoryChartData.some((item) => item.total > 0);
 
   return (
@@ -255,6 +297,13 @@ function Dashboard() {
             >
               Logout
             </button>
+            <Link
+              to="/friends"
+              className="px-4 py-2 border border-white/10 text-off-white/70 hover:text-off-white transition-colors"
+            >
+              Friends
+            </Link>
+            ;
           </div>
         </div>
 
@@ -686,6 +735,25 @@ function Dashboard() {
                     </div>
                   ),
                 )}
+              </div>
+            )}
+          </div>
+          <div className="bg-navy-card border border-white/5 p-6 mt-6">
+            <h2 className="font-heading font-semibold text-xl text-off-white mb-4">
+              What your friends are saying
+            </h2>
+            {myComments.length === 0 ? (
+              <p className="text-off-white/40">No comments yet.</p>
+            ) : (
+              <div className="space-y-3">
+                {myComments.map((c) => (
+                  <div key={c.id} className="border-b border-white/5 pb-3">
+                    <span className="text-gold text-sm font-medium">
+                      {c.author_email}
+                    </span>
+                    <p className="text-off-white mt-1">{c.text}</p>
+                  </div>
+                ))}
               </div>
             )}
           </div>

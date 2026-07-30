@@ -74,9 +74,24 @@ router.delete("/:id", async (req, res) => {
 // GET summary: current balance + spending by category for a date range (for pie chart)
 router.get("/summary", async (req, res) => {
   try {
-    const { from, to } = req.query;
+    const { from, to, userId } = req.query;
     if (!from || !to) {
       return res.status(400).json({ error: "from and to dates are required" });
+    }
+
+    let targetUserId = req.userId;
+
+    if (userId && parseInt(userId) !== req.userId) {
+      const friendCheck = await pool.query(
+        "SELECT 1 FROM friendships WHERE user_id = $1 AND friend_id = $2",
+        [req.userId, userId],
+      );
+      if (friendCheck.rows.length === 0) {
+        return res
+          .status(403)
+          .json({ error: "You are not friends with this user" });
+      }
+      targetUserId = parseInt(userId);
     }
 
     // spending by category
@@ -87,17 +102,16 @@ router.get("/summary", async (req, res) => {
        WHERE t.user_id = $1 AND t.date BETWEEN $2 AND $3
        GROUP BY c.name
        ORDER BY total DESC`,
-      [req.userId, from, to],
+      [targetUserId, from, to],
     );
 
-    // current balance = starting_balance - all-time total spent
     const userResult = await pool.query(
       "SELECT starting_balance FROM users WHERE id = $1",
-      [req.userId],
+      [targetUserId],
     );
     const totalSpentResult = await pool.query(
       "SELECT COALESCE(SUM(amount), 0) AS total FROM transactions WHERE user_id = $1",
-      [req.userId],
+      [targetUserId],
     );
 
     const startingBalance = parseFloat(userResult.rows[0].starting_balance);
