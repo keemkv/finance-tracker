@@ -5,8 +5,10 @@ const cors = require("cors");
 const app = express();
 const allowedOrigins = [
   "http://localhost:5173",
-  "finance-tracker-6i3h20ers-konstantin7.vercel.app",
-  "https://finance-tracker-virid-two-36.vercel.app/",
+  "https://finance-tracker-konstantin7.vercel.app",
+  "https://finance-tracker-git-main-konstantin7.vercel.app",
+  "https://finance-tracker-8k2ak8js2-konstantin7.vercel.app",
+  "https://finance-tracker-virid-two-36.vercel.app",
 ];
 
 app.use(
