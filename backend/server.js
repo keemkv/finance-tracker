@@ -12,7 +12,7 @@ app.use(
       if (
         !origin ||
         allowedOrigins.includes(origin) ||
-        /^https:\/\/finance-tracker.*konstantin7\.vercel\.app$/.test(origin)
+        /\.vercel\.app$/.test(origin)
       ) {
         callback(null, true);
       } else {
