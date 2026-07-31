@@ -3,13 +3,21 @@ const express = require("express");
 const cors = require("cors");
 
 const app = express();
+const allowedOrigins = [
+  "http://localhost:5173",
+  "finance-tracker-6i3h20ers-konstantin7.vercel.app",
+  "https://finance-tracker-virid-two-36.vercel.app/",
+];
 
 app.use(
   cors({
-    origin: [
-      "http://localhost:5173",
-      "https://finance-tracker-dwpob6500-konstantin7.vercel.app",
-    ],
+    origin(origin, callback) {
+      if (!origin || allowedOrigins.includes(origin)) {
+        callback(null, true);
+      } else {
+        callback(new Error("Not allowed by CORS"));
+      }
+    },
     credentials: true,
   }),
 );
