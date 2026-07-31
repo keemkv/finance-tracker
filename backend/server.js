@@ -1,7 +1,13 @@
 require("dotenv").config();
 const express = require("express");
 const cors = require("cors");
-
+app.use(
+  cors({
+    origin: "https://finance-tracker-crb673p3w-konstantin7.vercel.app",
+    methods: ["GET", "POST", "PUT", "DELETE"],
+    credentials: true,
+  }),
+);
 const app = express();
 const allowedOrigins = ["http://localhost:5173"];
 
