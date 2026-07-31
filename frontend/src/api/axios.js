@@ -1,7 +1,7 @@
 import axios from "axios";
 
 const api = axios.create({
-  baseURL: "http://localhost:5001/api",
+  baseURL: "https://finance-tracker-7gfm0vhj7-konstantin7.vercel.app/",
 });
 
 api.interceptors.request.use((config) => {
