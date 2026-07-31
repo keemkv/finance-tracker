@@ -9,10 +9,12 @@ const allowedOrigins = ["http://localhost:5173"];
 app.use(
   cors({
     origin(origin, callback) {
+      console.log("REQUEST ORIGIN:", origin);
+
       if (
         !origin ||
-        allowedOrigins.includes(origin) ||
-        /\.vercel\.app$/.test(origin)
+        origin.endsWith(".vercel.app") ||
+        origin === "http://localhost:5173"
       ) {
         callback(null, true);
       } else {
@@ -22,7 +24,6 @@ app.use(
     credentials: true,
   }),
 );
-
 app.use(express.json());
 
 const authRoutes = require("./routes/auth");
